@@ -99,10 +99,12 @@ func uncheckedAlphabet() []letterCell {
 
 func main() {
 	/*
-			   TODOS
-			   - check word is in dictionary (done)
-			   - check word is 5 letters (this could be done in the previous) (done)
-		       - print out an alphabet including colors of the guesses
+					   TODOS
+					   - check word is in dictionary (done)
+					   - check word is 5 letters (this could be done in the previous) (done)
+		               - give option for words with no duplicate letters?
+				       - print out an alphabet including colors of the guesses
+		               - properly handle duplicate letters in output
 	*/
 
 	rand.Seed(time.Now().UnixNano())

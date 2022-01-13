@@ -40,7 +40,7 @@ func GetDict() []string {
 	words := make([]string, 0)
 	for scanner.Scan() {
 		word := scanner.Text()
-		if fiveLetters.MatchString(word) && noDups(word) {
+		if fiveLetters.MatchString(word) { //&& noDups(word) {
 			words = append(words, word)
 		}
 	}
