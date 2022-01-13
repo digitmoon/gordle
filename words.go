@@ -17,6 +17,7 @@ const (
 	correct placement = iota
 	wrongplace
 	notpresent
+	unchecked
 )
 
 type letterCell struct {
@@ -32,6 +33,10 @@ func printLetterCell(l letterCell) {
 	yellow = yellow.Add(color.FgBlack, color.Bold)
 	white := color.New(color.BgWhite)
 	white = white.Add(color.FgBlack, color.Bold)
+
+	black := color.New(color.BgBlack)
+	black = black.Add(color.FgWhite, color.Bold)
+
 	switch l.pl {
 	case correct:
 		green.Printf("%c", l.ch)
@@ -42,7 +47,8 @@ func printLetterCell(l letterCell) {
 	case notpresent:
 		white.Printf("%c", l.ch)
 		break
-
+	case unchecked:
+		black.Printf("%c", l.ch)
 	}
 }
 
@@ -67,26 +73,46 @@ func CheckWord(src string, guess string) []letterCell {
 
 }
 
-func GetInput() string {
+func GetInput(dict *[]string) string {
 	reader := bufio.NewReader(os.Stdin)
 	text, _ := reader.ReadString('\n')
+	if len(text) != 6 {
+		fmt.Printf("%v not in dictionary\n", text)
+		return GetInput(dict)
+	}
 	five_chars := text[0:5]
-	return five_chars
+	if GuessInDict(five_chars, *dict) {
+		return five_chars
+	} else {
+		fmt.Printf("%v not in dictionary\n", five_chars)
+		return GetInput(dict)
+	}
+}
+
+func uncheckedAlphabet() []letterCell {
+	letters := make([]letterCell, 26)
+	for i, v := range "abcdefghijklmnopqrstuvwxyz" {
+		letters[i] = letterCell{v, unchecked}
+	}
+	return letters
 }
 
 func main() {
 	/*
 			   TODOS
-			   - check word is in dictionary
-			   - check word is 5 letters (this could be done in the previous)
+			   - check word is in dictionary (done)
+			   - check word is 5 letters (this could be done in the previous) (done)
 		       - print out an alphabet including colors of the guesses
 	*/
 
 	rand.Seed(time.Now().UnixNano())
-	word := NewWord()
+	dict := GetDict()
+	word := NewWord(dict)
+
+	alphabet := uncheckedAlphabet()
 
 	for i := 0; i < 6; i++ {
-		guess := GetInput()
+		guess := GetInput(&dict)
 		a := CheckWord(word, guess)
 		corr := true
 		for _, c := range a {
@@ -94,6 +120,10 @@ func main() {
 			if c.pl != correct {
 				corr = false
 			}
+		}
+		fmt.Println()
+		for _, v := range alphabet {
+			printLetterCell(v)
 		}
 		fmt.Println()
 		if corr {

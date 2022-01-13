@@ -21,6 +21,17 @@ func noDups(s string) bool {
 	return true
 }
 
+func GuessInDict(guess string, dict []string) bool {
+	for _, word := range dict {
+		if guess == word {
+			return true
+		} else if word > guess {
+			return false
+		}
+	}
+	return false
+}
+
 func GetDict() []string {
 	fiveLetters := regexp.MustCompile("^[a-z]{5}$")
 	f, _ := os.Open("./words.txt")
@@ -36,12 +47,11 @@ func GetDict() []string {
 	return words
 }
 
-func NewWord() string {
+func NewWord(dict []string) string {
 	//rand.Seed(time.Now().UnixNano())
-	d := GetDict()
-	n := len(d)
+	n := len(dict)
 	i := rand.Intn(n)
-	randomWord := d[i]
+	randomWord := dict[i]
 	return randomWord
 }
 
