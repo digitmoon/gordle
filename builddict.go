@@ -48,19 +48,8 @@ func GetDict() []string {
 }
 
 func NewWord(dict []string) string {
-	//rand.Seed(time.Now().UnixNano())
 	n := len(dict)
 	i := rand.Intn(n)
 	randomWord := dict[i]
 	return randomWord
 }
-
-/*
-
-func main() {
-	randomWord := NewWord()
-	fmt.Println(randomWord)
-
-}
-
-*/

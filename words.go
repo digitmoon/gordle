@@ -57,19 +57,42 @@ func CheckWord(src string, guess string) []letterCell {
 	g := []rune(guess)
 	s = g
 	g = s
-	r := make([]letterCell, 5)
-	// go through letters in guess, if letter at same place in src is same, return wordCell { ch, correct } else if letter in string return wordCell { ch, wrongplace } else return wordCell { ch, notpresent
+	ret := make([]letterCell, 5)
+
+	dupes := make(map[rune]int)
+	for _, r := range src {
+		_, found := dupes[r]
+		if found {
+			dupes[r]++
+		} else {
+			dupes[r] = 1
+		}
+	}
+	// TODO: Handle correct guesses first so as to be able to properly remove dupes
+
+	// go through letters in guess, if letter at same place in src is same, return wordCell { ch, correct }
+	// else if letter in string return wordCell { ch, wrongplace } -> deal with multiples of the letter existing
+	// else return wordCell { ch, notpresent }
 	for i := 0; i < len(src); i++ {
 		g := guess[i]
 		if src[i] == g {
-			r[i] = letterCell{rune(g), correct}
-		} else if strings.ContainsRune(src, rune(g)) {
-			r[i] = letterCell{rune(g), wrongplace}
-		} else {
-			r[i] = letterCell{rune(g), notpresent}
+			ret[i] = letterCell{rune(g), correct}
+			dupes[rune(g)]--
 		}
 	}
-	return r
+	for i := 0; i < len(src); i++ {
+		g := guess[i]
+		if src[i] == g {
+			continue
+
+		} else if strings.ContainsRune(src, rune(g)) && dupes[rune(g)] > 0 {
+			ret[i] = letterCell{rune(g), wrongplace}
+			dupes[rune(g)]--
+		} else {
+			ret[i] = letterCell{rune(g), notpresent}
+		}
+	}
+	return ret
 
 }
 
@@ -97,13 +120,25 @@ func uncheckedAlphabet() []letterCell {
 	return letters
 }
 
+func colorAlphabet(letters []letterCell, alphabet []letterCell) []letterCell {
+
+	for _, v := range letters {
+		alphIndex := v.ch - 'a'
+		if alphabet[alphIndex].pl == unchecked || (alphabet[alphIndex].pl == wrongplace && v.pl == correct) {
+			alphabet[alphIndex].pl = v.pl
+		}
+	}
+
+	return alphabet
+}
+
 func main() {
 	/*
 					   TODOS
 					   - check word is in dictionary (done)
 					   - check word is 5 letters (this could be done in the previous) (done)
 		               - give option for words with no duplicate letters?
-				       - print out an alphabet including colors of the guesses
+				       - print out an alphabet including colors of the guesses (done)
 		               - properly handle duplicate letters in output
 	*/
 
@@ -112,10 +147,11 @@ func main() {
 	word := NewWord(dict)
 
 	alphabet := uncheckedAlphabet()
-
+	defer func() { fmt.Println(word) }()
 	for i := 0; i < 6; i++ {
 		guess := GetInput(&dict)
 		a := CheckWord(word, guess)
+		alphabet = colorAlphabet(a, alphabet)
 		corr := true
 		for _, c := range a {
 			printLetterCell(c)
@@ -134,6 +170,6 @@ func main() {
 		}
 	}
 
-	fmt.Println(word)
+	//fmt.Println(word)
 
 }
