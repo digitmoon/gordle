@@ -52,15 +52,11 @@ func printLetterCell(l letterCell) {
 	}
 }
 
-func CheckWord(src string, guess string) []letterCell {
-	s := []rune(src)
-	g := []rune(guess)
-	s = g
-	g = s
-	ret := make([]letterCell, 5)
-
+func checkGuess(word string, guess string) []letterCell {
+	wordLength := len(word)
+	ret := make([]letterCell, wordLength)
 	dupes := make(map[rune]int)
-	for _, r := range src {
+	for _, r := range word {
 		_, found := dupes[r]
 		if found {
 			dupes[r]++
@@ -68,19 +64,19 @@ func CheckWord(src string, guess string) []letterCell {
 			dupes[r] = 1
 		}
 	}
-	for i := 0; i < len(src); i++ {
+	for i := 0; i < len(word); i++ {
 		g := guess[i]
-		if src[i] == g {
+		if word[i] == g {
 			ret[i] = letterCell{rune(g), correct}
 			dupes[rune(g)]--
 		}
 	}
-	for i := 0; i < len(src); i++ {
+	for i := 0; i < len(word); i++ {
 		g := guess[i]
-		if src[i] == g {
+		if word[i] == g {
 			continue
 
-		} else if strings.ContainsRune(src, rune(g)) && dupes[rune(g)] > 0 {
+		} else if strings.ContainsRune(word, rune(g)) && dupes[rune(g)] > 0 {
 			ret[i] = letterCell{rune(g), wrongplace}
 			dupes[rune(g)]--
 		} else {
@@ -91,19 +87,20 @@ func CheckWord(src string, guess string) []letterCell {
 
 }
 
-func GetInput(dict *[]string) string {
+func getGuessInput(dict []string) string {
+	wordLength := len(dict[0])
 	reader := bufio.NewReader(os.Stdin)
 	text, _ := reader.ReadString('\n')
-	if len(text) != 6 {
+	if len(text) != wordLength+1 {
 		fmt.Printf("%v not in dictionary\n", text)
-		return GetInput(dict)
+		return getGuessInput(dict)
 	}
-	five_chars := text[0:5]
-	if GuessInDict(five_chars, *dict) {
-		return five_chars
+	wordLengthChars := text[0:wordLength]
+	if GuessInSortedDict(wordLengthChars, dict) {
+		return wordLengthChars
 	} else {
-		fmt.Printf("%v not in dictionary\n", five_chars)
-		return GetInput(dict)
+		fmt.Printf("%v not in dictionary\n", wordLengthChars)
+		return getGuessInput(dict)
 	}
 }
 
@@ -116,7 +113,6 @@ func uncheckedAlphabet() []letterCell {
 }
 
 func colorAlphabet(letters []letterCell, alphabet []letterCell) []letterCell {
-
 	for _, v := range letters {
 		alphIndex := v.ch - 'a'
 		if alphabet[alphIndex].pl == unchecked || (alphabet[alphIndex].pl == wrongplace && v.pl == correct) {
@@ -140,8 +136,8 @@ func RunGame(dict []string) {
 	printAlphabet(alphabet)
 	defer func() { fmt.Println(word) }()
 	for i := 0; i < 6; i++ {
-		guess := GetInput(&dict)
-		a := CheckWord(word, guess)
+		guess := getGuessInput(dict)
+		a := checkGuess(word, guess)
 		alphabet = colorAlphabet(a, alphabet)
 		corr := true
 		for _, c := range a {
@@ -163,33 +159,6 @@ func RunGame(dict []string) {
 func main() {
 
 	rand.Seed(time.Now().UnixNano())
-	dict := GetDict()
+	dict := GetDict(5)
 	RunGame(dict)
-	/*
-		    word := NewWord(dict)
-
-			alphabet := uncheckedAlphabet()
-			defer func() { fmt.Println(word) }()
-			for i := 0; i < 6; i++ {
-				guess := GetInput(&dict)
-				a := CheckWord(word, guess)
-				alphabet = colorAlphabet(a, alphabet)
-				corr := true
-				for _, c := range a {
-					printLetterCell(c)
-					if c.pl != correct {
-						corr = false
-					}
-				}
-				fmt.Println()
-				for _, v := range alphabet {
-					printLetterCell(v)
-				}
-				fmt.Println()
-				if corr {
-					fmt.Printf("Correct in %d guesses!\n", i+1)
-					break
-				}
-			}
-	*/
 }

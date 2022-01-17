@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"fmt"
 	"math/rand"
 	"os"
 	"regexp"
@@ -21,7 +22,7 @@ func noDups(s string) bool {
 	return true
 }
 
-func GuessInDict(guess string, dict []string) bool {
+func GuessInSortedDict(guess string, dict []string) bool {
 	for _, word := range dict {
 		if guess == word {
 			return true
@@ -32,15 +33,16 @@ func GuessInDict(guess string, dict []string) bool {
 	return false
 }
 
-func GetDict() []string {
-	fiveLetters := regexp.MustCompile("^[a-z]{5}$")
+func GetDict(length int) []string {
+	regexpString := fmt.Sprintf("^[a-z]{%d}$", length)
+	fiveLetters := regexp.MustCompile(regexpString)
 	f, _ := os.Open("./words.txt")
 	defer f.Close()
 	scanner := bufio.NewScanner(f)
 	words := make([]string, 0)
 	for scanner.Scan() {
 		word := scanner.Text()
-		if fiveLetters.MatchString(word) { //&& noDups(word) {
+		if fiveLetters.MatchString(word) {
 			words = append(words, word)
 		}
 	}
