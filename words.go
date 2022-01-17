@@ -127,13 +127,17 @@ func colorAlphabet(letters []letterCell, alphabet []letterCell) []letterCell {
 	return alphabet
 }
 
-func main() {
+func printAlphabet(alphabet []letterCell) {
+	for _, v := range alphabet {
+		printLetterCell(v)
+	}
+	fmt.Println()
+}
 
-	rand.Seed(time.Now().UnixNano())
-	dict := GetDict()
+func RunGame(dict []string) {
 	word := NewWord(dict)
-
 	alphabet := uncheckedAlphabet()
+	printAlphabet(alphabet)
 	defer func() { fmt.Println(word) }()
 	for i := 0; i < 6; i++ {
 		guess := GetInput(&dict)
@@ -147,13 +151,45 @@ func main() {
 			}
 		}
 		fmt.Println()
-		for _, v := range alphabet {
-			printLetterCell(v)
-		}
-		fmt.Println()
+		printAlphabet(alphabet)
 		if corr {
 			fmt.Printf("Correct in %d guesses!\n", i+1)
 			break
 		}
 	}
+
+}
+
+func main() {
+
+	rand.Seed(time.Now().UnixNano())
+	dict := GetDict()
+	RunGame(dict)
+	/*
+		    word := NewWord(dict)
+
+			alphabet := uncheckedAlphabet()
+			defer func() { fmt.Println(word) }()
+			for i := 0; i < 6; i++ {
+				guess := GetInput(&dict)
+				a := CheckWord(word, guess)
+				alphabet = colorAlphabet(a, alphabet)
+				corr := true
+				for _, c := range a {
+					printLetterCell(c)
+					if c.pl != correct {
+						corr = false
+					}
+				}
+				fmt.Println()
+				for _, v := range alphabet {
+					printLetterCell(v)
+				}
+				fmt.Println()
+				if corr {
+					fmt.Printf("Correct in %d guesses!\n", i+1)
+					break
+				}
+			}
+	*/
 }
