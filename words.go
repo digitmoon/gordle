@@ -68,11 +68,6 @@ func CheckWord(src string, guess string) []letterCell {
 			dupes[r] = 1
 		}
 	}
-	// TODO: Handle correct guesses first so as to be able to properly remove dupes
-
-	// go through letters in guess, if letter at same place in src is same, return wordCell { ch, correct }
-	// else if letter in string return wordCell { ch, wrongplace } -> deal with multiples of the letter existing
-	// else return wordCell { ch, notpresent }
 	for i := 0; i < len(src); i++ {
 		g := guess[i]
 		if src[i] == g {
@@ -133,14 +128,6 @@ func colorAlphabet(letters []letterCell, alphabet []letterCell) []letterCell {
 }
 
 func main() {
-	/*
-					   TODOS
-					   - check word is in dictionary (done)
-					   - check word is 5 letters (this could be done in the previous) (done)
-		               - give option for words with no duplicate letters?
-				       - print out an alphabet including colors of the guesses (done)
-		               - properly handle duplicate letters in output
-	*/
 
 	rand.Seed(time.Now().UnixNano())
 	dict := GetDict()
@@ -169,7 +156,4 @@ func main() {
 			break
 		}
 	}
-
-	//fmt.Println(word)
-
 }
