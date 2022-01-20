@@ -90,16 +90,19 @@ func checkGuess(word string, guess string) []letterCell {
 func getGuessInput(dict []string) string {
 	wordLength := len(dict[0])
 	reader := bufio.NewReader(os.Stdin)
-	text, _ := reader.ReadString('\n')
-	if len(text) != wordLength+1 {
-		fmt.Printf("%v not in dictionary\n", text)
+	guess, _ := reader.ReadString('\n')
+	//for windows
+	guess = strings.TrimSuffix(guess, "\r\n")
+	//for linux/i assume osx
+	guess = strings.TrimSuffix(guess, "\n")
+	if len(guess) != wordLength {
+		fmt.Printf("%v is the wrong length, should be %d\n", guess, wordLength)
 		return getGuessInput(dict)
 	}
-	wordLengthChars := text[0:wordLength]
-	if GuessInSortedDict(wordLengthChars, dict) {
-		return wordLengthChars
+	if GuessInSortedDict(guess, dict) {
+		return guess
 	} else {
-		fmt.Printf("%v not in dictionary\n", wordLengthChars)
+		fmt.Printf("%v not in dictionary\n", guess)
 		return getGuessInput(dict)
 	}
 }
