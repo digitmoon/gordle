@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math/rand"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -160,8 +161,19 @@ func RunGame(dict []string) {
 }
 
 func main() {
-
 	rand.Seed(time.Now().UnixNano())
-	dict := GetDict(5)
-	RunGame(dict)
+	if len(os.Args) == 1 {
+		dict := GetDict(5)
+		RunGame(dict)
+	} else if len(os.Args) == 2 {
+		l, err := strconv.Atoi(os.Args[1])
+		if err != nil {
+			fmt.Printf("Usage: %v [number]\n", os.Args[0])
+		} else {
+			dict := GetDict(l)
+			RunGame(dict)
+		}
+	} else {
+		fmt.Printf("Usage: %v [number]\n", os.Args[0])
+	}
 }
